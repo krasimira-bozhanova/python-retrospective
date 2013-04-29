@@ -17,11 +17,12 @@ class Person:
                 if not gender or child.gender == gender]
 
     def siblings(self, gender=""):
-        parents_children = []
+        siblings = set()
         for parent in [self.father, self.mother]:
             if parent:
-                parents_children.extend(parent.children(gender))
-        return set([child for child in parents_children if child is not self])
+                siblings.update(parent.children(gender))
+        siblings.discard(self)
+        return siblings
 
     def get_brothers(self):
         return list(self.siblings("M"))
@@ -30,4 +31,4 @@ class Person:
         return list(self.siblings("F"))
 
     def is_direct_successor(self, person):
-        return person in self.children() or self in person.children()
+        return person in self.children()
