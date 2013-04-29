@@ -3,8 +3,8 @@ from collections import OrderedDict
 
 def groupby(func, seq):
     dictionary = {}
-    for x in seq:
-        dictionary.setdefault(func(x), []).append(x)
+    for args in seq:
+        dictionary.setdefault(func(args), []).append(args)
     return dictionary
 
 
@@ -19,22 +19,21 @@ def iterate(func):
 
 
 def zip_with(func, *iterables):
-    if iterables:
-        for x in zip(*iterables):
-            yield func(*x)
-           
+    return (func(*args) for args in zip(*iterables))
+
 
 def cache(func, cache_size):
+
+    if cache_size <= 0:
+        return func
+
     cache_dict = OrderedDict()
 
     def cache_memory(*args):
-        if args in cache_dict:
-            return cache_dict[args]
-        first_func_call = func(*args)
-        if cache_size:  
+        if args not in cache_dict:
             if len(cache_dict) >= cache_size:
-                cache_dict.popitem(last=False)
-            cache_dict[args] = first_func_call
-        return first_func_call
-        
+                cache_dict.popitem(False)
+            cache_dict[args] = func(*args)
+        return cache_dict[args]
+
     return cache_memory
